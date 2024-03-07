@@ -12,23 +12,36 @@ public class JpaMain {
     public static void main(String[] args) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
 
-        EntityManager entityManager = emf.createEntityManager();
+        EntityManager em = emf.createEntityManager();
 
-        EntityTransaction tx = entityManager.getTransaction();
+        EntityTransaction tx = em.getTransaction();
         tx.begin();
 
         try{
-            //code
-//             생성
-//            Member member = new Member();
-//            member.setId(2L);
-//            member.setName("HelloB");
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setTeam(team);
+            em.persist(member);
+
+            Member findMember = em.find(Member.class, member.getId());
+            Team findTeam = findMember.getTeam();
+            System.out.println("findTeam = " + findTeam.getName());
+
+            // 영속
+//            Member member1 = new Member(150L, "A");
+//            Member member2 = new Member(160L, "B");
 //
+//            entityManager.persist(member1);
+//            entityManager.persist(member2);
+//            System.out.println("=======================");
 //            //persist를 한 다음에 commit 할 것!!
-//            entityManager.persist(member);
 //
 //
-//             조회
+             //조회
 //            Member findMember = entityManager.find(Member.class, 1L);
 //            System.out.println("findMember = " + findMember.getId());
 //            System.out.println("findMember = " + findMember.getName());
@@ -46,13 +59,14 @@ public class JpaMain {
 //                System.out.println("memberName : " + member.getName());
 //            }
 
+            // commit하는 순간 db에 insert sql을 보낸다.
             tx.commit();
         }
         catch(Exception e){
             tx.rollback();
         }
         finally{
-            entityManager.close();
+            em.close();
         }
 
         emf.close();
